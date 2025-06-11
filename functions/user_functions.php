@@ -22,5 +22,11 @@ function createUser($conn, $username, $email, $password) {
     return $result;
 }
 
+function deleteUser($conn, $userId) {
+    $query = "DELETE FROM users WHERE id = $userId";
+    
+    $result = mysqli_query($conn, $query);
 
+    return $result;
+}
 ?>
