@@ -26,9 +26,10 @@ require_once __DIR__ . '/config.php';
                     <a href="<?= htmlspecialchars($base_url) ?>/views/dashboard.php" class="hover:text-emerald-200">Dashboard</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/user/manage_users.php" class="hover:text-emerald-200">Users</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/accounts.php" class="hover:text-emerald-200">Accounts</a>
-                    <a href="<?= htmlspecialchars($base_url) ?>/views/history.php" class="hover:text-emerald-200">History</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/incomes.php" class="hover:text-emerald-200">Incomes</a> 
-                    <a href="<?= htmlspecialchars($base_url) ?>/views/expenses.php" class="hover:text-emerald-200">Expenses</a> 
+                    <a href="<?= htmlspecialchars($base_url) ?>/views/expenses.php" class="hover:text-emerald-200">Expenses</a>
+                    <a href="<?= htmlspecialchars($base_url) ?>/views/history.php" class="hover:text-emerald-200">History</a>
+                    <a href="<?= htmlspecialchars($base_url) ?>/views/categories.php" class="hover:text-emerald-200">Categories</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/auth/logout.php"
                        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
                         <i data-lucide="log-out" class="h-5 w-5"></i>
