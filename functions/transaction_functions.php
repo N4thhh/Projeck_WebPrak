@@ -1,26 +1,63 @@
 <?php
-
-function addExpense(mysqli $conn, int $user_id, int $account_id, int $category_id, float $amount, string $description, string $transaction_date): bool
-{
-    $conn->begin_transaction();
-
-    try {
-        $stmt_insert = $conn->prepare(
-            "INSERT INTO transactions (user_id, account_id, category_id, type, amount, description, transaction_date) 
-             VALUES (?, ?, ?, 'expense', ?, ?, ?)"
-        );
-        $stmt_insert->bind_param("iiisds", $user_id, $account_id, $category_id, $amount, $description, $transaction_date);
-        $stmt_insert->execute();
-
-        $stmt_update = $conn->prepare("UPDATE accounts SET balance = balance - ? WHERE id = ? AND user_id = ?");
-        $stmt_update->bind_param("dii", $amount, $account_id, $user_id);
-        $stmt_update->execute();
-        
-        $conn->commit();
-        return true;
-
-    } catch (mysqli_sql_exception $exception) {
-        $conn->rollback();
-        return false;
+function getCurrentMonthTotal($conn, $userId, $type) {
+    $total = 0;
+    $query = "SELECT SUM(amount) as total FROM transactions 
+              WHERE user_id = ? AND type = ? AND MONTH(transaction_date) = MONTH(CURDATE()) AND YEAR(transaction_date) = YEAR(CURDATE())";
+              
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("is", $userId, $type);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $total = $row['total'] ?? 0;
     }
+    return $total;
+}
+
+
+function getRecentTransactions($conn, $userId, $limit = 5) {
+    $transactions = [];
+    $query = "SELECT 
+                t.transaction_date, t.description, t.amount, t.type, 
+                w.name as wallet_name, 
+                c.name as category_name
+              FROM transactions t
+              LEFT JOIN wallets w ON t.wallet_id = w.id
+              LEFT JOIN categories c ON t.category_id = c.id
+              WHERE t.user_id = ?
+              ORDER BY t.transaction_date DESC, t.id DESC
+              LIMIT ?";
+              
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ii", $userId, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $transactions[] = $row;
+        }
+    }
+    return $transactions;
+}
+
+function getExpenseChartData($conn, $userId) {
+    $chart_data = [];
+    $labels = [];
+    for ($i = 5; $i >= 0; $i--) {
+        $month = date('m', strtotime("-$i months"));
+        $year = date('Y', strtotime("-$i months"));
+        
+        $query = "SELECT SUM(amount) as total FROM transactions 
+                  WHERE user_id = ? AND type = 'expense' AND MONTH(transaction_date) = ? AND YEAR(transaction_date) = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("iii", $userId, $month, $year);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        
+        $chart_data[] = $result['total'] ?? 0;
+        $labels[] = date('M Y', strtotime("-$i months"));
+    }
+    return ['labels' => $labels, 'data' => $chart_data];
 }
