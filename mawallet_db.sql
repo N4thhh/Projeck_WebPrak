@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 11, 2025 at 06:09 AM
+-- Generation Time: Jun 12, 2025 at 12:12 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -24,55 +24,15 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `accounts`
---
-
-CREATE TABLE `accounts` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `balance` decimal(15,2) NOT NULL DEFAULT '0.00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `accounts`
---
-
-INSERT INTO `accounts` (`id`, `user_id`, `name`, `balance`) VALUES
-(5, 3, 'Tunai', '969000.00');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `categories`
 --
 
 CREATE TABLE `categories` (
   `id` int NOT NULL,
+  `user_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` enum('income','expense') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `categories`
---
-
-INSERT INTO `categories` (`id`, `name`, `type`) VALUES
-(1, 'Makanan & Minuman', 'expense'),
-(3, 'Transportasi', 'expense'),
-(5, 'Tagihan & Cicilan', 'expense'),
-(7, 'Belanja Kebutuhan', 'expense'),
-(9, 'Hiburan & Gaya Hidup', 'expense'),
-(11, 'Pendidikan', 'expense'),
-(13, 'Kesehatan', 'expense'),
-(15, 'Hadiah & Donasi', 'expense'),
-(17, 'Lain-lain', 'expense'),
-(19, 'Gaji', 'income'),
-(21, 'Bonus', 'income'),
-(23, 'Pendapatan Sampingan', 'income'),
-(25, 'Hadiah', 'income'),
-(27, 'Investasi', 'income'),
-(29, 'Lain-lain', 'income');
 
 -- --------------------------------------------------------
 
@@ -83,7 +43,7 @@ INSERT INTO `categories` (`id`, `name`, `type`) VALUES
 CREATE TABLE `transactions` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
-  `account_id` int NOT NULL,
+  `wallet_id` int NOT NULL,
   `category_id` int NOT NULL,
   `type` enum('income','expense') NOT NULL,
   `amount` decimal(15,2) NOT NULL,
@@ -91,15 +51,6 @@ CREATE TABLE `transactions` (
   `transaction_date` date NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `transactions`
---
-
-INSERT INTO `transactions` (`id`, `user_id`, `account_id`, `category_id`, `type`, `amount`, `description`, `transaction_date`, `created_at`) VALUES
-(1, 3, 5, 1, 'expense', '13000.00', '0', '2025-06-11', '2025-06-11 06:01:49'),
-(3, 3, 5, 1, 'expense', '13000.00', '0', '2025-06-11', '2025-06-11 06:01:55'),
-(5, 3, 5, 1, 'expense', '5000.00', '0', '2025-06-11', '2025-06-11 06:09:01');
 
 -- --------------------------------------------------------
 
@@ -115,29 +66,30 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `users`
+-- Table structure for table `wallets`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
-(3, 'jack', 'fernandoramadhani0611@gmail.com', '$2y$10$JdLodhJmzZuVX6NEUq0Ame3RyezSpQtctf7t2X/IyzafBdmqoKW2K', '2025-06-11 06:01:06');
+CREATE TABLE `wallets` (
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `balance` decimal(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `accounts`
---
-ALTER TABLE `accounts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
 -- Indexes for table `categories`
 --
 ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `transactions`
@@ -145,7 +97,7 @@ ALTER TABLE `categories`
 ALTER TABLE `transactions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `account_id` (`account_id`),
+  ADD KEY `wallet_id` (`wallet_id`),
   ADD KEY `category_id` (`category_id`);
 
 --
@@ -157,50 +109,27 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `wallets`
+--
+ALTER TABLE `wallets`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `accounts`
---
-ALTER TABLE `accounts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `categories`
---
-ALTER TABLE `categories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT for table `transactions`
---
-ALTER TABLE `transactions`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- AUTO_INCREMENT for table `wallets`
 --
-
---
--- Constraints for table `accounts`
---
-ALTER TABLE `accounts`
-  ADD CONSTRAINT `accounts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `transactions`
---
-ALTER TABLE `transactions`
-  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+ALTER TABLE `wallets`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
