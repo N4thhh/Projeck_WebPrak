@@ -20,7 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->begin_transaction();
         try {
             $stmt = $conn->prepare("INSERT INTO transactions (user_id, wallet_id, category_id, type, amount, description, transaction_date) VALUES (?, ?, ?, 'income', ?, ?, ?)");
-            $stmt->bind_param("iiisds", $user_id, $wallet_id, $category_id, $amount, $description, $transaction_date);
+            
+            $stmt->bind_param("iiidss", $user_id, $wallet_id, $category_id, $amount, $description, $transaction_date);
+            
             $stmt->execute();
 
             $stmt_update = $conn->prepare("UPDATE wallets SET balance = balance + ? WHERE id = ? AND user_id = ?");
@@ -70,7 +72,7 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
         <?php endif; ?>
 
         <form action="incomes.php" method="POST">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="amount" class="block text-gray-700 font-semibold mb-2">Amount</label>
                     <input type="number" id="amount" name="amount" step="0.01" required 

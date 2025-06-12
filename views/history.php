@@ -20,10 +20,7 @@ require_once __DIR__ . '/../includes/db.php';
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-emerald-600 text-white">
                     <tr>
-                        <th class="px-6 py-3">#</th>
-                        <th class="px-6 py-3">User ID</th>
-                        <th class="px-6 py-3">Account ID</th>
-                        <th class="px-6 py-3">Category ID</th>
+                        <th class="px-6 py-3">No</th>
                         <th class="px-6 py-3">Type</th>
                         <th class="px-6 py-3">Amount</th>
                         <th class="px-6 py-3">Description</th>
@@ -41,9 +38,6 @@ require_once __DIR__ . '/../includes/db.php';
                 ?>
                     <tr class="border-t hover:bg-gray-100 transition">
                         <td class="px-6 py-4"><?= $no++; ?></td>
-                        <td class="px-6 py-4"><?= htmlspecialchars($row['user_id']); ?></td>
-                        <td class="px-6 py-4"><?= htmlspecialchars($row['account_id']); ?></td>
-                        <td class="px-6 py-4"><?= htmlspecialchars($row['category_id']); ?></td>
                         <td class="px-6 py-4 capitalize"><?= htmlspecialchars($row['type']); ?></td>
                         <td class="px-6 py-4">Rp <?= number_format($row['amount'], 0, ',', '.'); ?></td>
                         <td class="px-6 py-4"><?= htmlspecialchars($row['description']); ?></td>
