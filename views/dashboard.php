@@ -10,8 +10,7 @@ if (!$is_logged_in) {
 
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../functions/transaction_functions.php';
-require_once __DIR__ . '/../functions/account_functions.php';
-?>
+//require_once __DIR__ . '/../functions/wallet_functions.php';?>
 
 <?php
 require_once __DIR__ . '/../includes/footer.php';
