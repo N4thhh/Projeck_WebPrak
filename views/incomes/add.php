@@ -1,13 +1,23 @@
 <?php
 $page_title = 'Add Income';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../../includes/header.php';
 
 if (!$is_logged_in) {
     header("Location: " . $base_url . "/auth/login.php");
     exit();
 }
 
-require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../../includes/db.php';
+
+$debug_categories = $conn->query("SELECT COUNT(*) as count FROM categories WHERE user_id = $user_id AND type = 'income'")->fetch_assoc();
+$debug_wallets = $conn->query("SELECT COUNT(*) as count FROM wallets WHERE user_id = $user_id")->fetch_assoc();
+
+if ($debug_categories['count'] == 0) {
+    $warning_message = "You need to create income categories first. <a href='../categories.php' class='underline'>Create categories here</a>";
+}
+if ($debug_wallets['count'] == 0) {
+    $warning_message = "You need to create wallets first. <a href='../wallets.php' class='underline'>Create wallets here</a>";
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = (float) $_POST['amount'];
@@ -33,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $_SESSION['success_message'] = "Income for '" . htmlspecialchars($description) . "' has been recorded successfully!";
             
-            header("Location: " . $base_url . "/views/incomes.php");
+            header("Location: " . $base_url . "/views/incomes/add.php");
             exit();
 
         } catch (mysqli_sql_exception $exception) {
@@ -71,7 +81,14 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
             </div>
         <?php endif; ?>
 
-        <form action="incomes.php" method="POST">
+        <?php if (isset($warning_message)): ?>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Warning!</p>
+                <p><?= $warning_message; ?></p>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST">
              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="amount" class="block text-gray-700 font-semibold mb-2">Amount</label>
@@ -122,5 +139,5 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
 </div>
 
 <?php
-require_once __DIR__ . '/../includes/footer.php';
+require_once __DIR__ . '/../../includes/footer.php';
 ?>
