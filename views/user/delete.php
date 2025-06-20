@@ -14,9 +14,15 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $user_id_to_delete = $_GET['id'];
 
     if ($user_id_to_delete == $_SESSION['user_id']) {
-        $_SESSION['error'] = "You cannot delete your own account.";
-        header("Location: manage_users.php");
-        exit();
+        deleteUser($conn, $user_id_to_delete);
+        session_start();
+
+        $_SESSION = array();
+
+        session_destroy();
+
+         header("Location: " . $base_url);
+        exit;
     }
 
 

@@ -47,7 +47,7 @@ $recent_transactions = getRecentTransactions($conn, $user_id, 5);
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Expense Chart (Last 6 Months)</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Expense Chart</h3>
             <div class="relative" style="height:250px">
                 <canvas id="expenseChart"></canvas>
             </div>
@@ -57,8 +57,8 @@ $recent_transactions = getRecentTransactions($conn, $user_id, 5);
             
             <div class="grid grid-cols-2 gap-4">
                 <a href="incomes/add.php" class="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 border border-green-200 p-4 rounded-lg text-center transition"><i data-lucide="plus-circle" class="h-8 w-8 text-green-600 mb-2"></i><p class="text-green-700 font-semibold">Add Income</p></a>
-                <a href="<?= $base_url ?>/views/expenses.php" class="flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 border border-red-200 p-4 rounded-lg text-center transition"><i data-lucide="minus-circle" class="h-8 w-8 text-red-600 mb-2"></i><p class="text-red-700 font-semibold">Add Expense</p></a>
-                <a href="<?= $base_url ?>/views/wallets/manage_wallets.php" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 border border-blue-200 p-4 rounded-lg text-center transition"><i data-lucide="credit-card" class="h-8 w-8 text-blue-600 mb-2"></i><p class="text-blue-700 font-semibold">Manage Wallets</p></a>
+                <a href="<?= $base_url ?>/views/expenses/add.php" class="flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 border border-red-200 p-4 rounded-lg text-center transition"><i data-lucide="minus-circle" class="h-8 w-8 text-red-600 mb-2"></i><p class="text-red-700 font-semibold">Add Expense</p></a>
+                <a href="<?= $base_url ?>/views/wallets.php" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 border border-blue-200 p-4 rounded-lg text-center transition"><i data-lucide="credit-card" class="h-8 w-8 text-blue-600 mb-2"></i><p class="text-blue-700 font-semibold">Manage Wallets</p></a>
                 <a href="<?= $base_url ?>/views/categories.php" class="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 border border-purple-200 p-4 rounded-lg text-center transition"><i data-lucide="tags" class="h-8 w-8 text-purple-600 mb-2"></i><p class="text-purple-700 font-semibold">Manage Categories</p></a>
             </div>
         </div>
