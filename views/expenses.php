@@ -38,34 +38,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $conn->commit();
                 
-                $_SESSION['success_message'] = "Expense for '" . htmlspecialchars($description) . "' has been recorded successfully!";
+                $_SESSION['success_message'] = "Pengeluaran '" . htmlspecialchars($description) . "' berhasil dicatat!";
                 header("Location: " . $base_url . "/views/expenses.php");
                 exit();
 
             } catch (mysqli_sql_exception $exception) {
                 $conn->rollback();
-                $error_message = "Failed to add expense: " . $exception->getMessage();
+                $error_message = "Gagal menambahkan pengeluaran: " . $exception->getMessage();
             }
         } else {
-            $error_message = "Insufficient funds in the selected wallet.";
+            $error_message = "Saldo di dompet tidak mencukupi.";
         }
     } else {
-        $error_message = "Please fill in all required fields.";
+        $error_message = "Mohon lengkapi semua data yang wajib diisi.";
     }
 }
 
-$categories_result = $conn->query("SELECT id, name FROM categories WHERE user_id = $user_id AND type = 'expense'");
-
+// ✅ FIXED: Gunakan 'nama' bukan 'name'
+$categories_result = $conn->query("SELECT id, nama FROM categories");
 $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user_id = $user_id");
 ?>
 
 <div class="max-w-2xl mx-auto py-6">
     <div class="bg-white p-8 rounded-xl shadow-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Record New Expense</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Catat Pengeluaran Baru</h2>
         
         <?php
         if (isset($_SESSION['success_message'])) {
-            echo '<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert"><p class="font-bold">Success!</p><p>' . $_SESSION['success_message'] . '</p></div>';
+            echo '<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert"><p class="font-bold">Berhasil!</p><p>' . $_SESSION['success_message'] . '</p></div>';
             unset($_SESSION['success_message']);
         }
         if (isset($error_message)) {
@@ -76,15 +76,15 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
         <form action="expenses.php" method="POST">
              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="amount" class="block text-gray-700 font-semibold mb-2">Amount</label>
+                    <label for="amount" class="block text-gray-700 font-semibold mb-2">Jumlah</label>
                     <input type="number" id="amount" name="amount" step="0.01" required 
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
                 <div>
-                    <label for="wallet_id" class="block text-gray-700 font-semibold mb-2">Source of Funds (Wallet)</label>
+                    <label for="wallet_id" class="block text-gray-700 font-semibold mb-2">Dompet Sumber</label>
                     <select id="wallet_id" name="wallet_id" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="">-- Select Wallet --</option>
+                        <option value="">-- Pilih Dompet --</option>
                         <?php while ($wallet = $wallets_result->fetch_assoc()): ?>
                             <option value="<?= $wallet['id'] ?>"><?= htmlspecialchars($wallet['name']) ?> (Rp <?= number_format($wallet['balance']) ?>)</option>
                         <?php endwhile; ?>
@@ -93,28 +93,31 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
             </div>
 
             <div class="mt-4">
-                <label for="category_id" class="block text-gray-700 font-semibold mb-2">Category</label>
+                <label for="category_id" class="block text-gray-700 font-semibold mb-2">Kategori</label>
                 <select id="category_id" name="category_id" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="">-- Select Category --</option>
-                     <?php if ($categories_result) { while ($category = $categories_result->fetch_assoc()): ?>
-                        <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
+                    <option value="">-- Pilih Kategori --</option>
+                    <?php if ($categories_result) { while ($category = $categories_result->fetch_assoc()): ?>
+                        <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['nama']) ?></option>
                     <?php endwhile; } ?>
                 </select>
             </div>
+
             <div class="mt-4">
-                <label for="description" class="block text-gray-700 font-semibold mb-2">Description</label>
-                <input type="text" id="description" name="description" required placeholder="e.g., Lunch at restaurant"
+                <label for="description" class="block text-gray-700 font-semibold mb-2">Deskripsi</label>
+                <input type="text" id="description" name="description" required placeholder="Contoh: Makan siang di warung"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
-             <div class="mt-4">
-                <label for="transaction_date" class="block text-gray-700 font-semibold mb-2">Date</label>
+            
+            <div class="mt-4">
+                <label for="transaction_date" class="block text-gray-700 font-semibold mb-2">Tanggal</label>
                 <input type="date" id="transaction_date" name="transaction_date" value="<?= date('Y-m-d') ?>" required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
+
             <div class="mt-6 text-right">
                 <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
-                    Save Expense
+                    Simpan Pengeluaran
                 </button>
             </div>
         </form>
