@@ -27,7 +27,7 @@ require_once __DIR__ . '/config.php';
                     <a href="<?= htmlspecialchars($base_url) ?>/views/user/manage_users.php" class="hover:text-emerald-200">Users</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/wallets.php" class="hover:text-emerald-200">Wallets</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/incomes/manage_incomes.php" class="hover:text-emerald-200">Incomes</a> 
-                    <a href="<?= htmlspecialchars($base_url) ?>/views/expenses.php" class="hover:text-emerald-200">Expenses</a>
+                    <a href="<?= htmlspecialchars($base_url) ?>/views/expenses/manage_expenses.php" class="hover:text-emerald-200">Expenses</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/history.php" class="hover:text-emerald-200">History</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/views/categories.php" class="hover:text-emerald-200">Categories</a>
                     <a href="<?= htmlspecialchars($base_url) ?>/auth/logout.php"
