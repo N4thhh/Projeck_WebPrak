@@ -20,7 +20,7 @@ function getAllKategoriByUser($conn, $user_id) {
 
 
 function getKategoriById($conn, $id) {
-    $id = (int)$id; // casting ke integer untuk keamanan
+    $id = (int)$id; 
     $query = "SELECT * FROM categories WHERE id = $id LIMIT 1";
     $result = mysqli_query($conn, $query);
     return $result ? mysqli_fetch_assoc($result) : null;
