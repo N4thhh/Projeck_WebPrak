@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden max-w-4xl w-full">
         
         <div class="hidden md:block md:w-1/2">
-             <img src="" class="w-full h-full object-cover">
+             <img src="../assets/login.png" class="w-full h-full object-cover">
         </div>
 
         <div class="w-full md:w-1/2 p-8 md:p-12">
