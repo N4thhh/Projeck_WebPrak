@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden max-w-4xl w-full">
         
         <div class="hidden md:block md:w-1/2">
-            <img src="https://images.unsplash.com/photo-1593697821252-8c1075d954ce?q=80&w=2070&auto=format&fit=crop" class="object-cover h-full w-full">
+            <img src="../assets/login.png" class="object-cover h-full w-full">
         </div>
 
         <div class="w-full md:w-1/2 p-8 md:p-12">
