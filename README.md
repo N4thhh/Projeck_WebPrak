@@ -46,7 +46,6 @@ Sistem ini bertujuan untuk menyediakan alat yang intuitif bagi pengguna untuk me
         * Buka menu "History" untuk melihat riwayat lengkap dari semua transaksi yang telah Anda catat.
 
 ## Kontributor
-*(Bagian ini dapat diisi dengan nama-nama anggota tim proyek Anda)*
 1.  [Bungaran Natanael Siahaan](https://github.com/N4thhh)
 2.  [Aathifah Dihyan Calysta](https://github.com/aathifahdc)
 3.  [Fernando Ramadhani](https://github.com/fernando-FTD)
