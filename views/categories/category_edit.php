@@ -12,7 +12,7 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-$kategori = getKategoriById($_GET['id']);
+$kategori = getKategoriById($conn, $_GET['id']);
 if (!$kategori || $kategori['user_id'] != $user_id) {
     echo "<div class='text-center text-red-600 mt-6'>Kategori tidak ditemukan atau tidak valid.</div>";
     require_once __DIR__ . '/../../includes/footer.php';

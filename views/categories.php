@@ -8,15 +8,18 @@ if (!$is_logged_in) {
     exit();
 }
 
+// Jika mau hapus
 if (isset($_GET['delete_id'])) {
-    $id = $_GET['delete_id'];
-    hapusKategori($id);
+    $id = (int)$_GET['delete_id'];
+    hapusKategori($conn, $id); // <- pastikan $conn dikirim
     $_SESSION['success_message'] = "Kategori berhasil dihapus.";
     header("Location: categories.php");
     exit();
 }
 
-$kategori_list = getAllKategoriByUser($user_id); // function ini harus ada di category_functions.php
+// Ambil list kategori
+$kategori_list = getAllKategoriByUser($conn, $user_id); // <- pastikan $conn dikirim
+// function ini harus ada di category_functions.php
 ?>
 
 <section class="bg-white rounded-xl shadow-lg p-6 mt-6">

@@ -8,27 +8,22 @@ function tambahKategori($user_id, $name, $type) {
     return $stmt->execute();
 }
 
-function getAllKategoriByUser($user_id) {
-    global $conn;
-    $stmt = $conn->prepare("SELECT * FROM categories WHERE user_id = ? ORDER BY id DESC");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    return $stmt->get_result();
+function hapusKategori($conn, $id) {
+    $id = (int)$id;
+    return mysqli_query($conn, "DELETE FROM categories WHERE id = $id AND user_id = ".$_SESSION['user_id']);
 }
 
-function hapusKategori($id, $user_id) {
-    global $conn;
-    $stmt = $conn->prepare("DELETE FROM categories WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("ii", $id, $user_id);
-    return $stmt->execute();
+function getAllKategoriByUser($conn, $user_id) {
+    $user_id = (int)$user_id;
+    return mysqli_query($conn, "SELECT * FROM categories WHERE user_id = $user_id");
 }
 
-function getKategoriById($id, $user_id) {
-    global $conn;
-    $stmt = $conn->prepare("SELECT * FROM categories WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("ii", $id, $user_id);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
+
+function getKategoriById($conn, $id) {
+    $id = (int)$id; // casting ke integer untuk keamanan
+    $query = "SELECT * FROM categories WHERE id = $id LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    return $result ? mysqli_fetch_assoc($result) : null;
 }
 
 function updateKategori($id, $user_id, $name, $type) {
