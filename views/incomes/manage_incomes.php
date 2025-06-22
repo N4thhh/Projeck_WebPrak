@@ -88,7 +88,7 @@ $incomes = $stmt->get_result();
               <td class="px-6 py-4 text-gray-600">
                 <div class="flex items-center">
                   <i data-lucide="calendar" class="h-4 w-4 mr-1 text-gray-400"></i>
-                  <?= date('Y M d', strtotime($income['transaction_date'])) ?>
+                  <?= date('d M Y', strtotime($income['transaction_date'])) ?>
                 </div>
               </td>
               <td class="px-6 py-4 text-center">
