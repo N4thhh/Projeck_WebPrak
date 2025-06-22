@@ -17,7 +17,6 @@ if ($income_id <= 0) {
     exit();
 }
 
-// Get income data
 $stmt = $conn->prepare("SELECT * FROM transactions WHERE id = ? AND user_id = ? AND type = 'income'");
 $stmt->bind_param("ii", $income_id, $user_id);
 $stmt->execute();
@@ -36,26 +35,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $wallet_id = (int) $_POST['wallet_id'];
     $transaction_date = $_POST['transaction_date'];
 
-    if ($amount > 0 && !empty($category_id) && !empty($wallet_id) && !empty($transaction_date)) {
+    // Debug: Let's see what we're getting
+    error_log("Debug - transaction_date received: " . $transaction_date);
+
+    // Validate date format
+    if (empty($transaction_date)) {
+        $error_message = "Transaction date is required.";
+    } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $transaction_date)) {
+        $error_message = "Invalid date format. Expected YYYY-MM-DD, got: " . $transaction_date;
+    } else {
+        // Validate it's a real date
+        $date_parts = explode('-', $transaction_date);
+        if (!checkdate($date_parts[1], $date_parts[2], $date_parts[0])) {
+            $error_message = "Invalid date. Please enter a valid date.";
+        }
+    }
+
+    if (!isset($error_message) && $amount > 0 && !empty($category_id) && !empty($wallet_id)) {
         $conn->begin_transaction();
         try {
-            // Calculate difference
             $old_amount = $income['amount'];
             $amount_difference = $amount - $old_amount;
             
-            // Update transaction
+            // DEBUG: Log what we're about to insert
+            error_log("Debug - About to update with date: " . $transaction_date);
+            
+            // FIXED: Correct bind_param format string
+            // d=double, s=string, i=integer, i=integer, s=string, i=integer, i=integer
             $stmt = $conn->prepare("UPDATE transactions SET amount = ?, description = ?, category_id = ?, wallet_id = ?, transaction_date = ? WHERE id = ? AND user_id = ?");
-            $stmt->bind_param("dsiiisi", $amount, $description, $category_id, $wallet_id, $transaction_date, $income_id, $user_id);
+            $stmt->bind_param("dsiisii", $amount, $description, $category_id, $wallet_id, $transaction_date, $income_id, $user_id);
             $stmt->execute();
 
-            // Update wallet balance if wallet changed or amount changed
+            // Handle wallet balance updates
             if ($wallet_id != $income['wallet_id']) {
-                // Remove from old wallet
+                // Moving to different wallet
                 $stmt_old = $conn->prepare("UPDATE wallets SET balance = balance - ? WHERE id = ?");
                 $stmt_old->bind_param("di", $old_amount, $income['wallet_id']);
                 $stmt_old->execute();
-                
-                // Add to new wallet
+
                 $stmt_new = $conn->prepare("UPDATE wallets SET balance = balance + ? WHERE id = ?");
                 $stmt_new->bind_param("di", $amount, $wallet_id);
                 $stmt_new->execute();
@@ -75,9 +92,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (mysqli_sql_exception $exception) {
             $conn->rollback();
             $error_message = "Failed to update income: " . $exception->getMessage();
+            error_log("Database error: " . $exception->getMessage());
         }
     } else {
-        $error_message = "Please fill in all required fields.";
+        if (!isset($error_message)) {
+            $error_message = "Please fill in all required fields with valid values.";
+        }
+    }
+}
+
+// Handle date display
+$dateValue = date('Y-m-d'); // Default to today
+if (!empty($income['transaction_date'])) {
+    $transaction_date = $income['transaction_date'];
+    
+    // If it's already in Y-m-d format
+    if (preg_match('/^\d{4}-\d{2}-\d{2}/', $transaction_date)) {
+        $dateValue = substr($transaction_date, 0, 10); // Take only date part (in case of datetime)
+    } else {
+        // Try to parse other formats
+        $formats = ['d/m/Y', 'd-m-Y', 'Y/m/d'];
+        foreach ($formats as $format) {
+            $date_obj = DateTime::createFromFormat($format, $transaction_date);
+            if ($date_obj) {
+                $dateValue = $date_obj->format('Y-m-d');
+                break;
+            }
+        }
     }
 }
 
@@ -103,7 +144,7 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
         <?php endif; ?>
 
         <form method="POST">
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="amount" class="block text-gray-700 font-semibold mb-2">Amount</label>
                     <input type="number" id="amount" name="amount" step="0.01" required 
@@ -147,7 +188,7 @@ $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user
             <div class="mt-4">
                 <label for="transaction_date" class="block text-gray-700 font-semibold mb-2">Date</label>
                 <input type="date" id="transaction_date" name="transaction_date" required
-                       value="<?= htmlspecialchars($income['transaction_date']) ?>"
+                       value="<?= htmlspecialchars($dateValue) ?>"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
             

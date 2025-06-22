@@ -26,15 +26,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $wallet_id = (int) $_POST['wallet_id'];
     $transaction_date = $_POST['transaction_date'];
 
-    if ($amount > 0 && !empty($category_id) && !empty($wallet_id) && !empty($transaction_date)) {
+    // Debug: Log what we're receiving
+    error_log("Debug - Add Income - transaction_date received: " . $transaction_date);
+
+    // Validate date format
+    if (empty($transaction_date)) {
+        $error_message = "Transaction date is required.";
+    } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $transaction_date)) {
+        $error_message = "Invalid date format. Expected YYYY-MM-DD, got: " . $transaction_date;
+    } else {
+        // Validate it's a real date
+        $date_parts = explode('-', $transaction_date);
+        if (!checkdate($date_parts[1], $date_parts[2], $date_parts[0])) {
+            $error_message = "Invalid date. Please enter a valid date.";
+        }
+    }
+
+    if (!isset($error_message) && $amount > 0 && !empty($category_id) && !empty($wallet_id)) {
         $conn->begin_transaction();
         try {
+            // Debug: Log what we're about to insert
+            error_log("Debug - Add Income - About to insert with date: " . $transaction_date);
+            
+            // FIXED: Correct bind_param format string
+            // i=integer, i=integer, i=integer, d=double, s=string, s=string
             $stmt = $conn->prepare("INSERT INTO transactions (user_id, wallet_id, category_id, type, amount, description, transaction_date) VALUES (?, ?, ?, 'income', ?, ?, ?)");
-            
             $stmt->bind_param("iiidss", $user_id, $wallet_id, $category_id, $amount, $description, $transaction_date);
-            
             $stmt->execute();
 
+            // Update wallet balance
             $stmt_update = $conn->prepare("UPDATE wallets SET balance = balance + ? WHERE id = ? AND user_id = ?");
             $stmt_update->bind_param("dii", $amount, $wallet_id, $user_id);
             $stmt_update->execute();
@@ -49,14 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (mysqli_sql_exception $exception) {
             $conn->rollback();
             $error_message = "Failed to add income: " . $exception->getMessage();
+            error_log("Database error in add income: " . $exception->getMessage());
         }
     } else {
-        $error_message = "Please fill in all required fields.";
+        if (!isset($error_message)) {
+            $error_message = "Please fill in all required fields with valid values.";
+        }
     }
 }
 
 $categories_result = $conn->query("SELECT id, name FROM categories WHERE user_id = $user_id AND type = 'income'");
-
 $wallets_result = $conn->query("SELECT id, name, balance FROM wallets WHERE user_id = $user_id");
 ?>
 

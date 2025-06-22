@@ -55,7 +55,6 @@ $incomes = $stmt->get_result();
 </div>
 <?php unset($_SESSION['error']); endif; ?>
 
-  <!-- Table -->
   <div class="bg-white shadow-lg rounded-lg overflow-hidden">
     <table class="min-w-full text-sm">
       <thead class="bg-gray-700 text-white">
@@ -89,7 +88,7 @@ $incomes = $stmt->get_result();
               <td class="px-6 py-4 text-gray-600">
                 <div class="flex items-center">
                   <i data-lucide="calendar" class="h-4 w-4 mr-1 text-gray-400"></i>
-                  <?= date('d M Y', strtotime($income['transaction_date'])) ?>
+                  <?= date('Y M d', strtotime($income['transaction_date'])) ?>
                 </div>
               </td>
               <td class="px-6 py-4 text-center">
@@ -120,10 +119,8 @@ $incomes = $stmt->get_result();
     </table>
   </div>
 
-  <!-- Summary Card -->
   <?php if ($incomes->num_rows > 0): ?>
     <?php 
-    // Reset result pointer to calculate total
     $stmt->execute();
     $incomes_for_total = $stmt->get_result();
     $total_income = 0;
